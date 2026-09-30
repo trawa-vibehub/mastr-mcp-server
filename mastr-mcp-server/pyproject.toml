@@ -41,6 +41,29 @@ mastr-mcp-server = "mastr_mcp_server:mcp.run"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+# Local change (see UPSTREAM.md). Without this, hatchling auto-detects only the
+# module matching the normalised project name — `mastr_mcp_server.py`, the
+# 40-line launcher — and the `mastr_mcp` package holding the actual MaStR
+# client is left out of the wheel. Invisible here, because the uv workspace
+# installs this member editable, but it breaks any consumer that depends on
+# this repo over git.
+[tool.hatch.build.targets.wheel]
+only-include = ["mastr_mcp", "mastr_mcp_server.py"]
+
+# The dropdown JSONs live beside pyproject.toml for the source checkout; ship a
+# copy inside the package so an installed wheel can find them too (filters.py
+# searches the package dir first). Without them every dropdown filter silently
+# passes labels through instead of resolving them to numeric MaStR IDs.
+[tool.hatch.build.targets.wheel.force-include]
+"unit_dropdowns.json" = "mastr_mcp/unit_dropdowns.json"
+"actor_dropdowns.json" = "mastr_mcp/actor_dropdowns.json"
+"consumption_dropdowns.json" = "mastr_mcp/consumption_dropdowns.json"
+"gas_production_dropdowns.json" = "mastr_mcp/gas_production_dropdowns.json"
+"gas_consumption_dropdowns.json" = "mastr_mcp/gas_consumption_dropdowns.json"
+
+[tool.hatch.build.targets.sdist]
+only-include = ["mastr_mcp", "mastr_mcp_server.py", "*.json", "README.md", "LICENSE"]
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.3",

@@ -327,6 +327,17 @@ NAP_BOOLEAN_KEYS: set[str] = {"planned"}
 # ─── Dropdown loading ────────────────────────────────────────────────────────
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
+_PACKAGE_DIR = Path(__file__).resolve().parent
+
+# Local change (see UPSTREAM.md): look inside the package first, then fall back
+# to the repo root. Running from a source checkout, the JSONs sit beside
+# pyproject.toml (_PROJECT_ROOT). Installed from a wheel, _PROJECT_ROOT is
+# site-packages/ and they are not there — the loader would log a warning and
+# return {}, which makes every dropdown filter "pass through unchanged". That
+# is silent wrong results, not a failure: Energieträger="Solare
+# Strahlungsenergie" would be sent as a literal string instead of its numeric
+# MaStR ID. The wheel ships a copy inside the package; this finds it.
+_DROPDOWN_SEARCH_PATH = (_PACKAGE_DIR, _PROJECT_ROOT)
 
 
 def _load_dropdowns(filename: str, label: str) -> dict[str, dict[str, str]]:
@@ -335,7 +346,10 @@ def _load_dropdowns(filename: str, label: str) -> dict[str, dict[str, str]]:
     Keys are lowercased German labels (fullwidth '\\uff06' normalized to '&'),
     values are the numeric MaStR IDs the Kendo filter expects.
     """
-    path = _PROJECT_ROOT / filename
+    path = next(
+        (p / filename for p in _DROPDOWN_SEARCH_PATH if (p / filename).is_file()),
+        _PROJECT_ROOT / filename,
+    )
     if not path.is_file():
         logger.warning(
             "%s not found — dropdown filters for %s will pass through unchanged.",
