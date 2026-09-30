@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "mastr": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "${workspaceFolder}",
+        "python",
+        "-m",
+        "mastr_analysis.mcp_server"
+      ]
+    }
+  }
+}

@@ -1,0 +1,32 @@
+# Credentials
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# zeep WSDL cache (SOAP client)
+*.sqlite
+
+# Data — raw/interim/processed files are never committed, only the folder markers
+data/raw/*
+data/interim/*
+data/processed/*
+!data/*/.gitkeep
+
+# Reports — generated figures are reproducible from notebooks/scripts
+reports/figures/*
+!reports/figures/.gitkeep
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
