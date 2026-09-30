@@ -1,0 +1,58 @@
+[project]
+name = "mastr-analysis"
+version = "0.1.0"
+description = "Data analysis on the Marktstammdatenregister (MaStR) — batteries, PV and CHP — built on top of the mastr-mcp-server client."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "click>=8.1",
+    "mastr-mcp-server",
+    "pandas>=2.2",
+    "pyarrow>=17.0",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    "tqdm>=4.66",
+]
+
+[project.scripts]
+mastr = "mastr_analysis.cli:cli"
+
+[dependency-groups]
+dev = [
+    "jupyterlab>=4.2",
+    "ipykernel>=6.29",
+    "ipywidgets>=8.1",
+    "matplotlib>=3.9",
+    "plotly>=5.24",
+    "pytest>=8.3",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mastr_analysis"]
+
+# ─── uv workspace: the vendored MCP server is a member, installed editable ───
+[tool.uv.workspace]
+members = ["mastr-mcp-server"]
+
+[tool.uv.sources]
+mastr-mcp-server = { workspace = true }
+
+[tool.uv]
+# Upstream mastr-mcp-server uses the mcp 1.x FastMCP API; 2.x renamed it.
+constraint-dependencies = ["mcp<2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["mastr-mcp-server", "notebooks"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
